@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Expense Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #f6f9fc, #e9f0f4);
+            color: #333;
+            padding: 40px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            transition: background 0.3s ease;
+        }
+
+        .section:hover {
+            background: #e2e8f0;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            transition: border-color 0.3s ease, transform 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #2563eb;
+            transform: scale(1.02);
+            outline: none;
+        }
+
+        .button-group, .clear-button-group {
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+            transform: scale(1.05);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+        }
+
+        .summary {
+            background: #e0f2fe;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .summary p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        /* Smooth transitions on load */
+        .input-group, .button-group, .table-container, .summary {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+
+        <div class="section">
+            <h2>Income</h2>
+            <div class="input-group">
+                <label for="income-description">Description</label>
+                <input type="text" id="income-description" placeholder="e.g. Salary" />
+            </div>
+            <div class="input-group">
+                <label for="income-amount">Amount ₹</label>
+                <input type="number" id="income-amount" placeholder="e.g. 100000" />
+            </div>
+            <div class="button-group">
+                <button onclick="addIncome()">Add Income</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Expenses</h2>
+            <div class="input-group">
+                <label for="expense-description">Description</label>
+                <input type="text" id="expense-description" placeholder="e.g. Rent" />
+            </div>
+            <div class="input-group">
+                <label for="expense-category">Category</label>
+                <select id="expense-category">
+                    <option value="Housing">Housing</option>
+                    <option value="Food">Food</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="expense-amount">Amount ₹</label>
+                <input type="number" id="expense-amount" placeholder="e.g. 50000" />
+            </div>
+            <div class="button-group">
+                <button onclick="addExpense()">Add Expense</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2>Transaction History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-history">
+                    <!-- Transactions will appear here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary">
+            <h2>Budget Summary</h2>
+            <p>Total Income: <span id="total-income">0</span></p>
+            <p>Total Expenses: <span id="total-expenses">0</span></p>
+            <p>Balance: <span id="balance">0</span></p>
+        </div>
+
+        <div class="clear-button-group">
+            <button onclick="clearAll()">Clear All</button>
+        </div>
+        <button onclick="logout()">Logout</button>
+<script>
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+  }
+</script>
+
+    </div>
+</body>
+<script>
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    function saveToLocal() {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+
+    function updateUI() {
+        const history = document.getElementById("transaction-history");
+        history.innerHTML = "";
+
+        let totalIncome = 0;
+        let totalExpenses = 0;
+
+        transactions.forEach((tx, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${tx.description}</td>
+                <td>${tx.category || "-"}</td>
+                <td>₹${tx.amount.toLocaleString()}</td>
+                <td>${tx.type}</td>
+                <td><button onclick="deleteTransaction(${index})">Delete</button></td>
+            `;
+            history.appendChild(row);
+
+            if (tx.type === "Income") totalIncome += tx.amount;
+            else totalExpenses += tx.amount;
+        });
+
+        document.getElementById("total-income").textContent = totalIncome.toLocaleString();
+        document.getElementById("total-expenses").textContent = totalExpenses.toLocaleString();
+        document.getElementById("balance").textContent = (totalIncome - totalExpenses).toLocaleString();
+
+        saveToLocal();
+    }
+
+    function addIncome() {
+        const desc = document.getElementById("income-description").value.trim();
+        const amount = parseFloat(document.getElementById("income-amount").value);
+
+        if (!desc || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid income.");
+            return;
+        }
+
+        transactions.push({ description: desc, category: "", amount, type: "Income" });
+        updateUI();
+
+        document.getElementById("income-description").value = "";
+        document.getElementById("income-amount").value = "";
+    }
+
+    function addExpense() {
+        const desc = document.getElementById("expense-description").value.trim();
+        const category = document.getElementById("expense-category").value;
+        const amount = parseFloat(document.getElementById("expense-amount").value);
+
+        if (!desc || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid expense.");
+            return;
+        }
+
+        transactions.push({ description: desc, category, amount, type: "Expense" });
+        updateUI();
+
+        document.getElementById("expense-description").value = "";
+        document.getElementById("expense-amount").value = "";
+    }
+
+    function deleteTransaction(index) {
+        transactions.splice(index, 1);
+        updateUI();
+    }
+
+    function clearAll() {
+        if (confirm("Clear all transactions?")) {
+            transactions = [];
+            updateUI();
+        }
+    }
+
+    // Initialize UI on load
+    window.onload = updateUI;
+</script>
+</html>
